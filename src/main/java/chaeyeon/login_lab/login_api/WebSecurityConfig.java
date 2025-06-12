@@ -21,7 +21,10 @@ public class WebSecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
         http.authorizeHttpRequests((auth) ->
-                        auth.anyRequest().authenticated() // 모든 요청은 인증 필요
+                        auth
+                                .requestMatchers("/api1").hasRole("user") // api를 호출할 수 있는 권한 지정 (URL)
+                                .requestMatchers("/api2").hasRole("admin")
+                                .anyRequest().authenticated() // 모든 요청은 인증 필요
                 ) // formLogin 추가하면 클래스 만들지 않았을 때처럼 기본 로그인 화면 제공
                 .formLogin((formLogin) ->
                         formLogin.usernameParameter("username") // 입력 폼 파라미터 지정
@@ -41,6 +44,7 @@ public class WebSecurityConfig {
         manager.createUser(User
                 .withUsername("user1")
                 .password("1234")
+                .roles("user") // 인가를 위한 권한 추가
                 .build());
 
         // Spring Security가 내부적으로 사용하는 UserDetailsService 구현체 반환
